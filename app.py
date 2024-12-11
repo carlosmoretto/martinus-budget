@@ -17,18 +17,21 @@ else:
 
     user_dict = st.session_state['authenticated']
 
-    METABASE_SITE_URL = st.secrets.credential.BI_URL
-    METABASE_SECRET_KEY = st.secrets.credential.BI_TOKEN
+    with st.status('Aguarde alguns instantes'):
+        st.write("Gerando relatório personalizado....")
 
-    payload = {
-        "resource": {"dashboard": int(user_dict["BI_BUDGET_ID"])},
-        "params": {
-            "empresa": user_dict["BI_BUDGET_FILTER"]
-        },
-        "exp": round(time.time()) + (60 * 30) # 10 minute expiration
-    }
+        METABASE_SITE_URL = st.secrets.credential.BI_URL
+        METABASE_SECRET_KEY = st.secrets.credential.BI_TOKEN
 
-    token = jwt.encode(payload, METABASE_SECRET_KEY, algorithm="HS256")
+        payload = {
+            "resource": {"dashboard": int(user_dict["BI_BUDGET_ID"])},
+            "params": {
+                "empresa": user_dict["BI_BUDGET_FILTER"]
+            },
+            "exp": round(time.time()) + (60 * 30) # 10 minute expiration
+        }
 
-    url_to_render = METABASE_SITE_URL + "/embed/dashboard/" + token + "#bordered=true&titled=true"
-    components.iframe(url_to_render, height=1200)
+        token = jwt.encode(payload, METABASE_SECRET_KEY, algorithm="HS256")
+
+        url_to_render = METABASE_SITE_URL + "/embed/dashboard/" + token + "#bordered=true&titled=true"
+        components.iframe(url_to_render, height=1200)
