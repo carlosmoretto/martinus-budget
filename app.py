@@ -16,6 +16,19 @@ else:
         logout()
 
     user_dict = st.session_state['authenticated']
+    def timer():
+        if 'time' not in st.session_state:
+            st.session_state.time = 0
+        st.session_state.time += 1
+
+        if st.session_state.time >= 2400:
+            st.warning('ATENÇÃO: Atualize a página para continuar visualizando.', icon="⚠️")
+
+    @st.fragment(run_every=1)
+    def show_timer():
+        timer()
+
+    show_timer()
 
     with st.status('Aguarde alguns instantes'):
         st.write("Gerando relatório personalizado....")
@@ -28,7 +41,7 @@ else:
             "params": {
                 "empresa": user_dict["BI_BUDGET_FILTER"]
             },
-            "exp": round(time.time()) + (60 * 30) # 10 minute expiration
+            "exp": round(time.time()) + (60 * 40) # 10 minute expiration
         }
 
         token = jwt.encode(payload, METABASE_SECRET_KEY, algorithm="HS256")
